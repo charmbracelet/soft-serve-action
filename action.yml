@@ -1,5 +1,8 @@
 name: 'Soft-Serve Action'
 description: 'A Github Action for Soft-Serve'
+branding:
+  icon: upload
+  color: yellow
 inputs:
   server:
     description: 'Soft-Serve address'
