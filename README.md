@@ -25,9 +25,11 @@ jobs:
       - name: Push to Soft-Serve
         uses: charmbracelet/soft-serve-action@master
         with:
-          server: my.soft-serve.srv
-          ssh-key: ${{ secrets.SOFT_SERVE_KEY }} # only required if soft-serve is configured to accept certain keys only
           name: foobar # soft-serve repository name (defaults to current repository name)
+          server: my.soft-serve.srv # the server that hosts Soft-Serve
+          ssh-key: ${{ secrets.SOFT_SERVE_KEY }} # only required if soft-serve is configured to accept certain keys only
+          ssh-user: abc # defaults to `git`
+          ssh-port: 23231 # defaults to 22
 ```
 
 ## License
