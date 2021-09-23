@@ -1,0 +1,52 @@
+name: 'Soft-Serve Action'
+description: 'A Github Action for Soft-Serve'
+inputs:
+  server:
+    description: 'Soft-Serve address'
+    required: true
+  ssh-key:
+    description: 'SSH key'
+    required: false
+  ssh-user:
+    description: 'SSH user'
+    required: true
+    default: 'git'
+  ssh-port:
+    description: 'SSH port'
+    required: true
+    default: '22'
+  name:
+    description: 'Name of the repository'
+    required: true
+    default: ${{ github.repository.name }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: add-ssh-key
+      shell: bash
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan ${{ inputs.server }} >> ~/.ssh/known_hosts
+        eval "$(ssh-agent -a $SSH_AUTH_SOCK)"
+        if [ -n "${{ inputs.ssh-key }}" ]; then
+          echo "${{ inputs.ssh-key }}" > ~/.ssh/soft_serve_id
+          chmod 0600 ~/.ssh/soft_serve_id
+          ssh-add ~/.ssh/soft_serve_id
+        fi
+
+    - id: add-remote
+      shell: bash
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        git remote add soft-serve ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/${{ inputs.name }}
+
+    - id: push
+      shell: bash
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        git push -f soft-serve HEAD:master
