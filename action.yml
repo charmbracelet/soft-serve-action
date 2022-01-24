@@ -52,4 +52,4 @@ runs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        git push -f soft-serve # force push the default branch to soft-serve
+        git push -f soft-serve $(git remote show origin | sed -n '/HEAD branch/s/.*: //p') # force push the default branch to soft-serve
