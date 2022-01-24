@@ -20,8 +20,7 @@ inputs:
     default: '22'
   name:
     description: 'Name of the repository'
-    required: true
-    default: ${{ github.repository.name }}
+    required: false
 
 runs:
   using: "composite"
@@ -40,16 +39,23 @@ runs:
           ssh-add ~/.ssh/soft_serve_id
         fi
 
+    - run: echo ::set-env name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")
+      shell: bash
+
     - id: add-remote
       shell: bash
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        git remote add soft-serve ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/${{ inputs.name }}
+        NAME=${{ inputs.name }}
+        if [ -z "${{ NAME }}" ]; then
+          NAME=$REPOSITORY_NAME
+        fi
+        git remote add soft-serve ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/$NAME
 
     - id: push
       shell: bash
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        git push -f soft-serve HEAD:$(git remote show origin | sed -n '/HEAD branch/s/.*: //p') # force push the default branch to soft-serve
+        git push -f soft-serve # force push the default branch to soft-serve
