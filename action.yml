@@ -48,7 +48,7 @@ runs:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
         NAME=${{ inputs.name }}
-        if [ -z "${{ NAME }}" ]; then
+        if [ -z "$NAME" ]; then
           NAME=$REPOSITORY_NAME
         fi
         git remote add soft-serve ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/$NAME
