@@ -39,7 +39,7 @@ runs:
           ssh-add ~/.ssh/soft_serve_id
         fi
 
-    - run: echo ::set-env name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")
+    - run: echo REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//") >> $GITHUB_ENV
       shell: bash
 
     - id: add-remote
@@ -49,7 +49,7 @@ runs:
       run: |
         NAME=${{ inputs.name }}
         if [ -z "$NAME" ]; then
-          NAME=$REPOSITORY_NAME
+          NAME=${{ env.REPOSITORY_NAME }}
         fi
         git remote add soft-serve ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/$NAME
 
