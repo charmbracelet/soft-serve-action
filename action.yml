@@ -21,10 +21,20 @@ inputs:
   name:
     description: 'Name of the repository'
     required: false
+  mirror:
+    description: 'Mirror repository'
+    default: 'false'
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - id: mirror
+      if: ${{ inputs.mirror == 'true' }}
+      shell: bash
+      run: |
+        git clone --mirror . mirror
+
     - id: add-ssh-key
       shell: bash
       env:
@@ -42,7 +52,7 @@ runs:
     - run: echo REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//") >> $GITHUB_ENV
       shell: bash
 
-    - id: add-remote
+    - id: push
       shell: bash
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -51,11 +61,11 @@ runs:
         if [ -z "$NAME" ]; then
           NAME=${{ env.REPOSITORY_NAME }}
         fi
-        git remote add soft-serve ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/$NAME
-
-    - id: push
-      shell: bash
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        git push --prune --force --all --follow-tags soft-serve
+        REMOTE=ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/$NAME
+        if [ "${{ inputs.mirror }}" = "true" ]; then
+          cd mirror
+          git push --mirror $REMOTE
+        else
+          git remote add soft-serve $REMOTE
+          git push --prune --force --all --follow-tags soft-serve
+        fi
