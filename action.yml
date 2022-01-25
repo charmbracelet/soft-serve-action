@@ -58,4 +58,4 @@ runs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        git push -f soft-serve # force push the default branch to soft-serve
+        git push --mirror -f soft-serve
