@@ -58,4 +58,4 @@ runs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        git push --prune --force --all --tags soft-serve
+        git push --prune --force --all --follow-tags soft-serve
