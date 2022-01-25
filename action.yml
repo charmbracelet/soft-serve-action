@@ -33,7 +33,7 @@ runs:
       if: ${{ inputs.mirror == 'true' }}
       shell: bash
       run: |
-        git clone --mirror . mirror
+        git clone --mirror $(git config --get remote.origin.url) mirror
 
     - id: add-ssh-key
       shell: bash
