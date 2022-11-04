@@ -53,7 +53,7 @@ We’d love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## License
 
-[MIT](https://github.com/charmbracelet/vhs/raw/main/LICENSE)
+[MIT](https://github.com/charmbracelet/soft-serve/raw/main/LICENSE)
 
 ***
 
