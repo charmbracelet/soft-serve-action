@@ -38,6 +38,8 @@ jobs:
           ssh-user: abc
           # Port on which the SSH server is running, defaults to: 22
           ssh-port: 23231
+          # Whether or not to use git mirror to mirror the repository
+          mirror: true
 
 ```
 
