@@ -1,6 +1,6 @@
 # Soft Serve Action
 
-![soft-serve-action-banner](https://user-images.githubusercontent.com/42545625/199863722-1a195d17-43f7-4775-b1d9-d2d178b867b2.png)
+![soft-serve-action-banner](https://stuff.charm.sh/soft-serve/soft-serve-action-banner.png)
 
 Synchronize GitHub repositories to your own [Soft Serve](https://github.com/charmbracelet/soft-serve) server on every push with GitHub actions. By the way, [Soft Serve](https://github.com/charmbracelet/soft-serve) is a self-hostable Git server for the command line.
 
