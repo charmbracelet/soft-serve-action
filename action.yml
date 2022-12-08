@@ -56,6 +56,7 @@ runs:
       shell: bash
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        GIT_SSH_COMMAND: ssh -i $HOME/.ssh/soft_serve_id -o IdentitiesOnly=yes
       run: |
         NAME=${{ inputs.name }}
         if [ -z "$NAME" ]; then
