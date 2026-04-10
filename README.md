@@ -7,7 +7,6 @@ Synchronize GitHub repositories to your own [Soft Serve](https://github.com/char
 ## Example
 
 ```yaml
-
 name: Soft-Serve
 
 on:
@@ -21,12 +20,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # git cannot push a shallow clone
 
       - name: Push to Soft Serve
-        uses: charmbracelet/soft-serve-action@master
+        uses: charmbracelet/soft-serve-action@v1
         with:
           # Repository name on Soft Serve (defaults to GitHub repository name)
           name: foobar

@@ -33,23 +33,26 @@ runs:
       if: ${{ inputs.mirror == 'true' }}
       shell: bash
       run: |
-        git clone --mirror $(git config --get remote.origin.url) mirror
+        git clone --mirror "$(git config --get remote.origin.url)" mirror
 
     - id: add-ssh-key
       shell: bash
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        INPUT_SERVER: ${{ inputs.server }}
+        INPUT_SSH_KEY: ${{ inputs.ssh-key }}
+        INPUT_SSH_PORT: ${{ inputs.ssh-port }}
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan ${{ inputs.server }} >> ~/.ssh/known_hosts
-        eval "$(ssh-agent -a $SSH_AUTH_SOCK)"
-        if [ -n "${{ inputs.ssh-key }}" ]; then
-          echo "${{ inputs.ssh-key }}" > ~/.ssh/soft_serve_id
+        ssh-keyscan -p "${INPUT_SSH_PORT}" "${INPUT_SERVER}" >> ~/.ssh/known_hosts
+        eval "$(ssh-agent -a "$SSH_AUTH_SOCK")"
+        if [ -n "${INPUT_SSH_KEY}" ]; then
+          echo "${INPUT_SSH_KEY}" > ~/.ssh/soft_serve_id
           chmod 0600 ~/.ssh/soft_serve_id
           ssh-add ~/.ssh/soft_serve_id
         fi
 
-    - run: echo REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//") >> $GITHUB_ENV
+    - run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> "$GITHUB_ENV"
       shell: bash
 
     - id: push
@@ -57,16 +60,21 @@ runs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         GIT_SSH_COMMAND: ssh -i $HOME/.ssh/soft_serve_id -o IdentitiesOnly=yes
+        INPUT_NAME: ${{ inputs.name }}
+        INPUT_SSH_USER: ${{ inputs.ssh-user }}
+        INPUT_SERVER: ${{ inputs.server }}
+        INPUT_SSH_PORT: ${{ inputs.ssh-port }}
+        INPUT_MIRROR: ${{ inputs.mirror }}
       run: |
-        NAME=${{ inputs.name }}
-        if [ -z "$NAME" ]; then
-          NAME=${{ env.REPOSITORY_NAME }}
+        NAME="${INPUT_NAME}"
+        if [ -z "${NAME}" ]; then
+          NAME="${REPOSITORY_NAME}"
         fi
-        REMOTE=ssh://${{ inputs.ssh-user }}@${{ inputs.server }}:${{ inputs.ssh-port }}/$NAME
-        if [ "${{ inputs.mirror }}" = "true" ]; then
+        REMOTE="ssh://${INPUT_SSH_USER}@${INPUT_SERVER}:${INPUT_SSH_PORT}/${NAME}"
+        if [ "${INPUT_MIRROR}" = "true" ]; then
           cd mirror
-          git push --mirror $REMOTE
+          git push --mirror "${REMOTE}"
         else
-          git remote add soft-serve $REMOTE
+          git remote add soft-serve "${REMOTE}"
           git push --prune --force --all --follow-tags soft-serve
         fi
